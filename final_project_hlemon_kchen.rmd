@@ -39,19 +39,20 @@ day_name=dat$DAYNAME
 table_death_count2020=table(dat$DOA)
 
 total2020=table_death_count2020[2]+table_death_count2020[3]
-total2020
 
 table_death_count2019=table(dat19$DOA)
 total2019=table_death_count2019[2]+table_death_count2019[3]
-total2019
 
 df2019=data.frame(total2019)
 df2020=data.frame(total2020)
 
-tabledata = c("Year", "Count")
+counts= c(df2019$total2019, df2020$total2020)
+years = c('2019', '2020')
 
-ggplot(df2019, aes(y=df2019$total2019))+ geom_histogram(binwidth = 5)+ggtitle("DEATH COUNT PER YEAR 2019")
-ggplot(df2020, aes(y=df2020$total2020))+ geom_histogram(binwidth = 5)+ggtitle("DEATH COUNT PER YEAR 2020")
+df=data.frame(years, counts)
+
+ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Fatality Count per Year")
+
 ```
 V
 ```{r}
