@@ -30,11 +30,6 @@ dat19=data.frame(person2019)
 
 # extract entities 
 ```{r}
-state_name=dat$STATENAME
-month_name=dat$MONTHNAME
-day_name=dat$DAYNAME
-
-
 # total car wreck deaths in 2019&2020
 table_death_count2020=table(dat20$DOA)
 
@@ -58,19 +53,14 @@ V
 ```{r}
 
 n19=table(dat19$MONTHNAME)
-n19
-
 df19=data.frame(n19)
-df19
 
 n20=table(dat20$MONTHNAME)
 df20=data.frame(n20)
-df20
 
 
 ggplot(data = df19, aes(y=df19$Freq, x=df19$Var1))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")
 ggplot(data = df20, aes(y=df20$Freq, x=df20$Var1))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")
-
 ```
 # apply filters for unknown data 
 ```{r}
@@ -92,11 +82,9 @@ v2019=read.csv("./violatn2020.CSV")
 #speeding codes
 viol_df2019=data.frame(table(v2019$VIOLATION))
 speeding2019=viol_df2019$Freq[20]+viol_df2019$Freq[21]+viol_df2019$Freq[22]+viol_df2019$Freq[23]+viol_df2019$Freq[24]+viol_df2019$Freq[25]
-speeding2019
 
 viol_df2020=data.frame(table(v2020$MVIOLATN))
 speeding2020=viol_df2020$Freq[20]+viol_df2020$Freq[21]+viol_df2020$Freq[22]+viol_df2020$Freq[23]+viol_df2020$Freq[24]+viol_df2020$Freq[25]
-speeding2020
 
 counts= c(speeding2019, speeding2020)
 years = c('2019', '2020')
@@ -112,10 +100,7 @@ ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+
 #Accidents related to Alcohol 
 ```{r}
 alc_df2019=data.frame(table(dat19$DRINKING))
-alc_df2019$Freq[2]
-
 alc_df2020=data.frame(table(dat20$DRINKING))
-alc_df2020$Freq[2]
 
 counts= c(alc_df2019$Freq[2], alc_df2020$Freq[2])
 years = c('2019', '2020')
