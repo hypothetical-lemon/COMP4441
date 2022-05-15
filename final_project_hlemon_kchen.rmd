@@ -7,7 +7,9 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
+#library(tidyverse)
+library(dplyr)
+library(ggplot2)
 ```
 
 ## R Markdown
@@ -15,15 +17,70 @@ library(tidyverse)
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
+#load data
 ```{r}
+person2020 = read.csv("./person2020.csv")
+dat=data.frame(person2020)
+head(dat)
 
+person2019 = read.csv("./person2019.csv")
+dat19=data.frame(person2019)
+head(dat)
 ```
 
+# extract entities 
+```{r}
+state_name=dat$STATENAME
+month_name=dat$MONTHNAME
+day_name=dat$DAYNAME
+#age=dat$AGE
+
+# total car wreck deaths in 2019&2020
+
+table_death_count2020=table(dat$DOA)
+table_death_count2020
+
+table_death_count2019=table(dat19$DOA)
+table_death_count2019
+
+names(dimnames(table_death_count2019))
 
 
+```
+V
 ```{r}
 
+n=table(dat$MONTHNAME)
+n
+ggplot(data = dat, aes(x=MONTHNAME))+geom_bar(width=.7)+ggtitle("DEATH COUNT PER MONTH")
+```
+# apply filters for unknown data 
+```{r}
+age_f<-data.frame(AGE=dat$AGE[dat$AGE<115])
+ggplot(data=age_f, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
