@@ -57,10 +57,20 @@ ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+
 V
 ```{r}
 
-n=table(dat$MONTHNAME)
-n
-ggplot(data = dat20, aes(x=MONTHNAME))+geom_bar(width=.7)+ggtitle("DEATH COUNT PER MONTH")
-ggplot(data = dat19, aes(x=MONTHNAME))+geom_bar(width=.7)+ggtitle("DEATH COUNT PER MONTH")
+n19=table(dat19$MONTHNAME)
+n19
+
+df19=data.frame(n19)
+df19
+
+n20=table(dat20$MONTHNAME)
+df20=data.frame(n20)
+df20
+
+
+ggplot(data = df19, aes(y=df19$Freq, x=df19$Var1))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")
+ggplot(data = df20, aes(y=df20$Freq, x=df20$Var1))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")
+
 ```
 # apply filters for unknown data 
 ```{r}
