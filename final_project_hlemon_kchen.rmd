@@ -20,12 +20,12 @@ When you click the **Knit** button a document will be generated that includes bo
 #load data
 ```{r}
 person2020 = read.csv("./person2020.csv")
-dat=data.frame(person2020)
-head(dat)
+dat20=data.frame(person2020)
+
 
 person2019 = read.csv("./person2019.csv")
 dat19=data.frame(person2019)
-head(dat)
+
 ```
 
 # extract entities 
@@ -36,7 +36,7 @@ day_name=dat$DAYNAME
 
 
 # total car wreck deaths in 2019&2020
-table_death_count2020=table(dat$DOA)
+table_death_count2020=table(dat20$DOA)
 
 total2020=table_death_count2020[2]+table_death_count2020[3]
 
@@ -59,25 +59,61 @@ V
 
 n=table(dat$MONTHNAME)
 n
-ggplot(data = dat, aes(x=MONTHNAME))+geom_bar(width=.7)+ggtitle("DEATH COUNT PER MONTH")
+ggplot(data = dat20, aes(x=MONTHNAME))+geom_bar(width=.7)+ggtitle("DEATH COUNT PER MONTH")
+ggplot(data = dat19, aes(x=MONTHNAME))+geom_bar(width=.7)+ggtitle("DEATH COUNT PER MONTH")
 ```
 # apply filters for unknown data 
 ```{r}
-age_f<-data.frame(AGE=dat$AGE[dat$AGE<115])
-ggplot(data=age_f, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE")
+age_f<-data.frame(AGE=dat20$AGE[dat20$AGE<115])
+ggplot(data=age_f, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2020")
+
+age_19<-data.frame(AGE=dat19$AGE[dat19$AGE<115])
+ggplot(data=age_19, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2019")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-
+#Speeding Violations
 ```{r}
+v2020=read.csv("./violatn2019.CSV")
+v2019=read.csv("./violatn2020.CSV")
+
+
+#speeding codes
+viol_df2019=data.frame(table(v2019$VIOLATION))
+speeding2019=viol_df2019$Freq[20]+viol_df2019$Freq[21]+viol_df2019$Freq[22]+viol_df2019$Freq[23]+viol_df2019$Freq[24]+viol_df2019$Freq[25]
+speeding2019
+
+viol_df2020=data.frame(table(v2020$MVIOLATN))
+speeding2020=viol_df2020$Freq[20]+viol_df2020$Freq[21]+viol_df2020$Freq[22]+viol_df2020$Freq[23]+viol_df2020$Freq[24]+viol_df2020$Freq[25]
+speeding2020
+
+counts= c(speeding2019, speeding2020)
+years = c('2019', '2020')
+
+df=data.frame(years, counts)
+
+ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Speeding Count per Year")
 
 ```
 
 
 
+#Accidents related to Alcohol 
+```{r}
+alc_df2019=data.frame(table(dat19$DRINKING))
+alc_df2019$Freq[2]
 
+alc_df2020=data.frame(table(dat20$DRINKING))
+alc_df2020$Freq[2]
 
+counts= c(alc_df2019$Freq[2], alc_df2020$Freq[2])
+years = c('2019', '2020')
+
+df_alc=data.frame(years, counts)
+
+ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Alcohol Related Death Count")
+```
 
 
 
