@@ -49,7 +49,7 @@ df=data.frame(years, counts)
 ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Fatality Count per Year")
 
 ```
-V
+
 ```{r}
 
 n19=table(dat19$MONTHNAME)
@@ -60,21 +60,19 @@ df20=data.frame(n20)
 
 sort_by_month<-factor(df19, levels = month.name)
 
-sort_by_month
-
 df_month_19=data.frame(sort_by_month)
 df_month_20=data.frame(sort_by_month)
 
-ggplot(data = df19, aes(x=df19$Var1, y=df19$Freq))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")+scale_x_discrete(limits=month.name)
-ggplot(data = df20, aes(x=df20$Var1, y=df20$Freq))+geom_bar(stat = "identity", width =.3)+ggtitle("DEATH COUNT PER MONTH")+scale_x_discrete(limits=month.name)
+ggplot(data = df19, aes(x=Var1, y=Freq))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH 2019")+scale_x_discrete(limits=month.name)
+ggplot(data = df20, aes(x=Var1, y=Freq))+geom_bar(stat = "identity", width =.3)+ggtitle("DEATH COUNT PER MONTH 2020")+scale_x_discrete(limits=month.name)
 ```
 # apply filters for unknown data 
 ```{r}
-age_f<-data.frame(AGE=dat20$AGE[dat20$AGE<115])
-ggplot(data=age_f, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2020")
-
 age_19<-data.frame(AGE=dat19$AGE[dat19$AGE<115])
 ggplot(data=age_19, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2019")
+
+age_f<-data.frame(AGE=dat20$AGE[dat20$AGE<115])
+ggplot(data=age_f, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2020")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
