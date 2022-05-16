@@ -58,9 +58,15 @@ df19=data.frame(n19)
 n20=table(dat20$MONTHNAME)
 df20=data.frame(n20)
 
+sort_by_month<-factor(df19, levels = month.name)
 
-ggplot(data = df19, aes(y=df19$Freq, x=df19$Var1))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")
-ggplot(data = df20, aes(y=df20$Freq, x=df20$Var1))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")
+sort_by_month
+
+df_month_19=data.frame(sort_by_month)
+df_month_20=data.frame(sort_by_month)
+
+ggplot(data = df19, aes(x=df19$Var1, y=df19$Freq))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH")+scale_x_discrete(limits=month.name)
+ggplot(data = df20, aes(x=df20$Var1, y=df20$Freq))+geom_bar(stat = "identity", width =.3)+ggtitle("DEATH COUNT PER MONTH")+scale_x_discrete(limits=month.name)
 ```
 # apply filters for unknown data 
 ```{r}
@@ -107,7 +113,7 @@ years = c('2019', '2020')
 
 df_alc=data.frame(years, counts)
 
-ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Alcohol Related Death Count")
+ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3,  position="dodge", fill= 'blue')+ggtitle("Alcohol Related Death Count")
 ```
 
 
@@ -180,7 +186,13 @@ ggplot(cases, aes(month)) + geom_bar(aes(weight=logpositive), position="dodge", 
 ```
 
 
+#Regression Method
+```{r}
 
+
+
+
+```
 
 
 
