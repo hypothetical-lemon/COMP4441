@@ -112,6 +112,56 @@ ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width 
 
 
 
+```{r}
+
+#This section gets the total count of covid-19 cases from January-December 2020 
+dat <- read.csv('national-history.csv')
+#dat
+
+#we care about aggregate positive 
+#the column 'positive' from the last day of each month
+#from January 2020 - December 2020
+#then plot
+
+#convert date to datetime
+dat %>%
+   mutate(date=as.Date(date))
+
+#cut to all entries between January 2020 - December 2020
+y_2020 <- filter(dat, dat$date <= '2020-12-31' )
+y_2020
+
+#take the final case counts from each month
+# creates an identifier with which to group
+y_2020$mon_yr <- format(as.Date(y_2020$date), '%Y-%m') 
+#groups by created month identifier and then keeps only those rows with last(max) date
+cases <- y_2020 %>% group_by(mon_yr) %>% filter(date == max(date))
+cases
+
+```
+
+
+
+```{r}
+#graph the positive cases
+
+cases$logpositive = log(cases$positive)
+cases$monthnames <- months(as.Date(cases$date))
+cases$month<-factor(cases$monthnames, levels = month.name)
+
+ggplot(data = cases, aes(x = month, y = logpositive)) +
+  geom_point() +
+  labs(x = "Month",
+    y = "Postive Cases (Log)",
+    title = "Positive Covid Cases in 2020 (Log form)") +   theme(axis.text.x=element_text(angle=45,hjust=1))
+
+ggplot(data = cases, aes(x = month, y = positive)) +
+  geom_point() +
+  labs(x = "Month",
+    y = "Postive Cases",
+    title = "Positive Covid Cases in 2020") + theme(axis.text.x=element_text(angle=45,hjust=1))
+```
+
 
 
 
