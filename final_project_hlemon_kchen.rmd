@@ -163,6 +163,23 @@ ggplot(data = cases, aes(x = month, y = positive)) +
 ```
 
 
+```{r}
+#covid cases as a bar chart
+
+cases$logpositive = log(cases$positive)
+cases$monthnames <- months(as.Date(cases$date))
+cases$month<-factor(cases$monthnames, levels = month.name)
+
+ggplot(cases, aes(month)) + geom_bar(aes(weight=positive), position="dodge", fill= 'lightblue') + theme(axis.text.x=element_text(angle=45,hjust=1)) + labs(x = "Month",
+    y = "Postive Cases",
+    title = "Positive Covid Cases in 2020")
+
+ggplot(cases, aes(month)) + geom_bar(aes(weight=logpositive), position="dodge", fill= 'lightblue') + theme(axis.text.x=element_text(angle=45,hjust=1)) +  labs(x = "Month",
+    y = "Postive Cases (log)",
+    title = "Positive Covid Cases in 2020 in Log Format")
+```
+
+
 
 
 
