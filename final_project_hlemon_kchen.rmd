@@ -63,8 +63,13 @@ sort_by_month<-factor(df19, levels = month.name)
 df_month_19=data.frame(sort_by_month)
 df_month_20=data.frame(sort_by_month)
 
-ggplot(data = df19, aes(x=Var1, y=Freq))+geom_bar(stat = "identity", width = .3)+ggtitle("DEATH COUNT PER MONTH 2019")+scale_x_discrete(limits=month.name)
-ggplot(data = df20, aes(x=Var1, y=Freq))+geom_bar(stat = "identity", width =.3)+ggtitle("DEATH COUNT PER MONTH 2020")+scale_x_discrete(limits=month.name)
+ggplot(data = df19, aes(x=Var1, y=Freq))+geom_bar(stat = "identity",alpha=0.7, fill="#33AADE", color="black")+ggtitle("DEATH COUNT PER MONTH 2019")+scale_x_discrete(limits=month.name)
+ggplot(data = df20, aes(x=Var1, y=Freq))+geom_bar(stat = "identity", alpha=0.7, fill="#be2596", color="black")+ggtitle("DEATH COUNT PER MONTH 2020")+scale_x_discrete(limits=month.name)
+
+combined_df=rbind(df19, df20)
+
+ggplot(data = combined_df, aes(x=Var1, y=Freq))+geom_histogram(data = df19, stat="identity",  alpha = 0.5, fill = "#33AADE") + geom_histogram(data = df20, stat="identity", fill = "#be2596", alpha = 0.5)+ggtitle("DEATH COUNT COMBINED")+scale_x_discrete(limits=month.name)
+
 ```
 # apply filters for unknown data 
 ```{r}
