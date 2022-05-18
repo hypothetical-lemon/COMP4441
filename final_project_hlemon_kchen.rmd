@@ -49,7 +49,7 @@ df=data.frame(years, counts)
 ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Fatality Count per Year")
 
 ```
-
+# Breaking down deaths per Month
 ```{r}
 
 n19=table(dat19$MONTHNAME)
@@ -103,7 +103,11 @@ df=data.frame(years, counts)
 ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Speeding Count per Year")
 
 ```
-
+```
+I would be hesitant to say that speeding was a major factor of why the increase in falities despite me having friends/family say that
+they noticed an increase of people speeding. 
+I found this article mentioning speeding as a reason for more deaths: https://www.thelongofirm.com/posts/colorado-car-accident-fatalities-increase-2020
+```
 
 
 #Accidents related to Alcohol 
@@ -116,11 +120,11 @@ years = c('2019', '2020')
 
 df_alc=data.frame(years, counts)
 
-ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3,  position="dodge", fill= 'blue')+ggtitle("Alcohol Related Death Count")
+ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3,  position="dodge", fill="#33AADE", color="black")+ggtitle("Alcohol Related Death Count")
 ```
 
 
-
+# COVID case datasets
 ```{r}
 
 #This section gets the total count of covid-19 cases from January-December 2020 
