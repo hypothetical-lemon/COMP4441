@@ -184,7 +184,7 @@ ggplot(cases, aes(month)) + geom_bar(aes(weight=logpositive), position="dodge", 
 ```
 
 
-#Regression Method
+#Ridge Regression Method
 ```{r}
 
 
