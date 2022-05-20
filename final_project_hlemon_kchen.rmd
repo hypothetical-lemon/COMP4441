@@ -12,11 +12,11 @@ library(dplyr)
 library(ggplot2)
 ```
 
-## R Markdown
+# The question we would like to answer 
+Do you think the car wreck fatality rate went up or down from 2019-2020? 
+Did Covid have an impact on car wreck fatalities? 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 #load data
 ```{r}
 person2020 = read.csv("./person2020.csv")
@@ -46,7 +46,7 @@ years = c('2019', '2020')
 
 df=data.frame(years, counts)
 
-ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Fatality Count per Year")
+ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3, alpha=0.7, color="black")+ggtitle("Fatality Count per Year")
 
 ```
 # Breaking down deaths per Month
@@ -63,13 +63,14 @@ sort_by_month<-factor(df19, levels = month.name)
 df_month_19=data.frame(sort_by_month)
 df_month_20=data.frame(sort_by_month)
 
-ggplot(data = df19, aes(x=Var1, y=Freq))+geom_bar(stat = "identity",alpha=0.7, fill="#33AADE", color="black")+ggtitle("DEATH COUNT PER MONTH 2019")+scale_x_discrete(limits=month.name)
-ggplot(data = df20, aes(x=Var1, y=Freq))+geom_bar(stat = "identity", alpha=0.7, fill="#be2596", color="black")+ggtitle("DEATH COUNT PER MONTH 2020")+scale_x_discrete(limits=month.name)
+ggplot(data = df19, aes(x=Var1, y=Freq))+geom_point(stat = "identity")+geom_line()+ggtitle("DEATH COUNT PER MONTH 2019")+scale_x_discrete(limits=month.name)
+ggplot(data = df20, aes(x=Var1, y=Freq))+geom_point(stat = "identity")+geom_line()+ggtitle("DEATH COUNT PER MONTH 2020")+scale_x_discrete(limits=month.name)
 
 combined_df=rbind(df19, df20)
 
-ggplot(data = combined_df, aes(x=Var1, y=Freq))+geom_histogram(data = df19, stat="identity",  alpha = 0.5, fill = "#33AADE") + geom_histogram(data = df20, stat="identity", fill = "#be2596", alpha = 0.5)+ggtitle("DEATH COUNT COMBINED")+scale_x_discrete(limits=month.name)
+ggplot(data = combined_df, aes(x=Var1, y=Freq))+geom_point(data = df19, stat="identity") + geom_point(data = df20, stat="identity")+ggtitle("DEATH COUNT COMBINED")+scale_x_discrete(limits=month.name)
 
+ggplot(data = df19, aes(x=Var1, y=Freq))+geom_point()+geom_line()+ggtitle("DEATH COUNT COMBINED")+scale_x_discrete(limits=month.name)
 ```
 # apply filters for unknown data 
 ```{r}
@@ -94,12 +95,12 @@ speeding2019=viol_df2019$Freq[20]+viol_df2019$Freq[21]+viol_df2019$Freq[22]+viol
 viol_df2020=data.frame(table(v2020$MVIOLATN))
 speeding2020=viol_df2020$Freq[20]+viol_df2020$Freq[21]+viol_df2020$Freq[22]+viol_df2020$Freq[23]+viol_df2020$Freq[24]+viol_df2020$Freq[25]
 
-counts= c(speeding2019, speeding2020)
+speeding_counts= c(speeding2019, speeding2020)
 years = c('2019', '2020')
 
-df=data.frame(years, counts)
+df=data.frame(years, speeding_counts)
 
-ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Speeding Count per Year")
+ggplot(data=df, aes(x=years, y=speeding_counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Speeding Count per Year")
 
 ```
 ```
@@ -119,7 +120,7 @@ years = c('2019', '2020')
 
 df_alc=data.frame(years, counts)
 
-ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3,  position="dodge", fill="#33AADE", color="black")+ggtitle("Alcohol Related Death Count")
+ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Alcohol Related Death Count")
 ```
 
 
@@ -245,14 +246,20 @@ ggplot(df_reshaped, aes(x, y, col = group)) +  geom_line(aes(group = group)) + t
 
 ```
 
-#Ridge Regression Method
-```{r}
+#Ridge Regression Method (Math)
+
+Ridge Regression is used to fit a model that has multicollinearity while trying to 
+minimize the (RSS) sum of square residuals. 
+Col-linearity in regression is the event of two or more variables being highly linearly related. 
 
 
+In terms of relationships between variables, our use case refers to the target or dependent 
+variable as the number of car wrecks. The independent variable or predictor variable could be any of these; 
+speeding, weather, age, covid, alcohol, drugs, etc. 
 
 
-```
-
+#The Ridge Regession Esimator 
+$$\hat \beta \left( \lambda \right) = \left( X^TX+\lambda I_p \cdot_p \right)^ \minus1 $$
 
 
 
