@@ -191,6 +191,59 @@ ggplot(cases, aes(month)) + geom_bar(aes(weight=logpositive), position="dodge", 
     title = "Positive Covid Cases in 2020 in Log Format")
 ```
 
+#this is the part where we compare covid-19 data from 2020 to road accident data in 2020
+
+```{r}
+# total car wrecks in 2020
+car_wrecks <- read.csv('person2020.csv')
+
+```
+
+```{r}
+#counts of car wrecks by month
+df <- data.frame(aggregate(car_wrecks, by=list(car_wrecks$MONTHNAME), FUN=length))
+names(df) <- c('Month','Crashes')
+
+#stick it in a new data frame
+columns <- c('Month','Crashes')
+data2020 <- df[,columns]
+
+data2020
+
+```
+
+
+
+```{r}
+#combine covid 2020 with car crashes 2020
+covid <- data.frame(cases$monthnames, cases$positive)
+names(covid) <- c("Month", "Cases")
+
+total <- merge(data2020, covid, by.x = "Month", by.y="Month")
+names(total) <- c("Month", "Crashes", "Cases") #naming them so we don't throw an error
+
+total$logCases <- log(total$Cases)
+total$logCrashes<-log(total$Crashes)
+total
+```
+
+
+```{r}
+#graph the total 
+
+# Reshape data frame
+df_reshaped <- data.frame(x = total$Month,                           
+                       y = c(total$logCases, total$logCrashes),
+                       group = c(rep("Cases", nrow(df)),
+                                 rep("Crashes", nrow(df))))
+
+df_reshaped$x <- factor(df_reshaped$x, levels = month.name)
+
+ggplot(df_reshaped, aes(x, y, col = group)) +  geom_line(aes(group = group)) + theme(axis.text.x=element_text(angle=45,hjust=1)) +  labs(x = "Month",
+    y = "Crashes and Cases",
+    title = "Road Crashes and Covid Cases by Month in 2020 (Log)")
+
+```
 
 #Ridge Regression Method
 ```{r}
