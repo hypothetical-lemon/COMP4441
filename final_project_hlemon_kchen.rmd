@@ -1,13 +1,38 @@
 ---
-title: "COMP 4441 Final Project"
-author: "Heather Lemon & Katie Chen"
+pdf_document: default
+author: "Katie Chen & Heather Lemon"
 date: "2022/05/23"
-output: pdf_document
+output:
+  word_document: default
+  pdf_document: default
+title: "Road Incidents, Car Wreck Fatalities & Covid in the United States 2019-2020"
 ---
 
-```{r setup, include=FALSE}
+Introduction:
+
+The COVID-19 pandemic first reached the United States in January of 2020, 
+and rapidly spread throughout the country until it reached its first peak in 
+March of 2020. In this project, we aim to find out if the number of national 
+road incidents and car wreck fatalities changed between 2019 and 2020 when the 
+pandemic began. Additionally, we want to know if the COVID-19 pandemic was a 
+factor in affecting the number of driving incidents in 2020.
+
+Authors:
+
+Heather Lemon - Part 1 Comparing FARS 2019 with FARS 2020 Data
+Katie Chen - Part 2 Comparing FARS 2020 Data with the Covid Tracking Project
+
+Data Sets:
+
+https://www.nhtsa.gov/file-downloads?p=nhtsa/downloads/FARS/
+https://covidtracking.com/data/national
+
+
+Loading in all the necessary libraries:
+
+```{r}
 knitr::opts_chunk$set(echo = TRUE)
-#library(tidyverse)
+library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(reshape2)
@@ -15,12 +40,15 @@ library(lubridate)
 library(glmnet)
 ```
 
-# The questions we would like to answer 
-Do you think the car wreck fatality rate went up or down from 2019-2020? 
-Did Covid have an impact on car wreck fatalities? 
+# The questions we would like to answer:
+Do you think the car wreck fatality rate went up or down from 2019-2020?
+Did Covid have an impact on car wreck fatalities?
 
 
-#Load people dataset
+# Part 1: FARS (Fatality Analysis Reporting System) 2019-2020 Comparisons
+Reading in the data:
+
+# Load people dataset:
 ```{r}
 person2020 = read.csv("./person2020.csv")
 dat20=data.frame(person2020)
@@ -31,7 +59,7 @@ dat19=data.frame(person2019)
 
 ```
 
-# Total Car Wreck Deaths in 2020&2019 
+# Total Car Wreck Deaths in 2020&2019:
 ```{r}
 table_death_count2020=table(dat20$DOA)
 
@@ -48,12 +76,13 @@ years = c('2019', '2020')
 
 df=data.frame(years, counts)
 
-ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3, alpha=0.7, color="black")+ggtitle("Fatality Count per Year")
+ggplot(data=df, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3, 
+alpha=0.7, color="black")+ggtitle("Fatality Count per Year")
 
 percent_increase = ((counts[2]-counts[1])/counts[1]) * 100
 percent_increase
 ```
-# Breaking down deaths per Month
+# Breaking down deaths per Month:
 ```{r}
 
 n19=table(dat19$MONTHNAME)
@@ -67,14 +96,30 @@ sort_by_month<-factor(df19, levels = month.name)
 df_month_19=data.frame(sort_by_month)
 df_month_20=data.frame(sort_by_month)
 
-ggplot(data = df19, aes(x=Var1, y=Freq))+geom_point(stat = "identity")+geom_line()+ggtitle("DEATH COUNT PER MONTH 2019")+scale_x_discrete(limits=month.name)
-ggplot(data = df20, aes(x=Var1, y=Freq))+geom_point(stat = "identity")+geom_line()+ggtitle("DEATH COUNT PER MONTH 2020")+scale_x_discrete(limits=month.name)
+ggplot(data = df19, aes(x=Var1, y=Freq))+
+  geom_point(stat = "identity")+geom_line()+
+  ggtitle("DEATH COUNT PER MONTH 2019")+
+  scale_x_discrete(limits=month.name)
+
+ggplot(data = df20, aes(x=Var1, y=Freq))+geom_point(stat = "identity")+
+  geom_line()+ggtitle("DEATH COUNT PER MONTH 2020")+
+  scale_x_discrete(limits=month.name)
 
 combined_df=rbind(df19, df20)
 
-ggplot(data = combined_df, aes(x=Var1, y=Freq))+geom_point(data = df19, stat="identity")+geom_line() + geom_point(data = df20, stat="identity")+ggtitle("DEATH COUNT COMBINED")+scale_x_discrete(limits=month.name)
+ggplot(data = combined_df, aes(x=Var1, y=Freq))+
+  geom_point(data = df19, stat="identity")+
+  geom_line()+geom_point(data = df20, stat="identity")+
+  ggtitle("DEATH COUNT COMBINED")+
+  scale_x_discrete(limits=month.name)
 ```
-# Group by Age 
+
+Apply filters for unknown data:
+
+Age was inferred to be a factor in determining the differences between 2019 
+and 2020 car fatalities and road accidents. 
+The graphs show the ages of drivers between the two years.
+# Age
 ```{r}
 age_19<-data.frame(AGE=dat19$AGE[dat19$AGE<115])
 ggplot(data=age_19, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2019")
@@ -84,7 +129,12 @@ ggplot(data=age_f, aes(x=AGE))+geom_bar(width=.5)+ggtitle("AGE 2020")
 ```
 
 
-# Speeding Violations
+# Speeding Violations:
+
+Speeding violations were inferred to be another factor that could impact the 
+number of road accidents and fatalities. The graph below shows the total number 
+of speeding violations per year and the percentage change between 2019 and 2020.
+
 ```{r}
 v2020=read.csv("./violatn2019.CSV")
 v2019=read.csv("./violatn2020.CSV")
@@ -92,29 +142,37 @@ v2019=read.csv("./violatn2020.CSV")
 
 #speeding codes
 viol_df2019=data.frame(table(v2019$VIOLATION))
-speeding2019=viol_df2019$Freq[20]+viol_df2019$Freq[21]+viol_df2019$Freq[22]+viol_df2019$Freq[23]+viol_df2019$Freq[24]+viol_df2019$Freq[25]
+speeding2019=viol_df2019$Freq[20]+viol_df2019$Freq[21]+viol_df2019$Freq[22]
++viol_df2019$Freq[23]+viol_df2019$Freq[24]+viol_df2019$Freq[25]
 
 viol_df2020=data.frame(table(v2020$MVIOLATN))
-speeding2020=viol_df2020$Freq[20]+viol_df2020$Freq[21]+viol_df2020$Freq[22]+viol_df2020$Freq[23]+viol_df2020$Freq[24]+viol_df2020$Freq[25]
+speeding2020=viol_df2020$Freq[20]+viol_df2020$Freq[21]+viol_df2020$Freq[22]
++viol_df2020$Freq[23]+viol_df2020$Freq[24]+viol_df2020$Freq[25]
 
 speeding_counts= c(speeding2019, speeding2020)
 years = c('2019', '2020')
 
 df=data.frame(years, speeding_counts)
 
-ggplot(data=df, aes(x=years, y=speeding_counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Speeding Count per Year")
+ggplot(data=df, aes(x=years, y=speeding_counts))+geom_bar(stat = "identity", 
+width = .3)+ggtitle("Speeding Count per Year")
 
-percent_speeding = ((speeding_counts[2]-speeding_counts[1])/speeding_counts[1]) * 100
+percent_speeding = 
+  ((speeding_counts[2]-speeding_counts[1])/speeding_counts[1]) * 100
 percent_speeding
 ```
-```
-I would be hesitant to say that speeding was a major factor of why the increase in falities despite me having friends/family say that
-they noticed an increase of people speeding. 
-I found this article mentioning speeding as a reason for more deaths: https://www.thelongofirm.com/posts/colorado-car-accident-fatalities-increase-2020
-```
 
+From the observation above, we would be hesitant to say that speeding was a major 
+factor of why the increase in fatalities, despite having personal connections say 
+that there has been a noticeable increase of people speeding.
 
-# Alcohol 
+For example, here is an article relating speeding as a reason for more deaths: https://www.thelongofirm.com/posts/colorado-car-accident-fatalities-increase-2020
+
+# Accidents related to Alcohol:
+
+Alcohol-related incidents would have been another contributing factor towards road 
+incidents and fatalities. The graph below shows the total number of alcohol-related deaths between 2019 and 2020.
+
 ```{r}
 alc_df2019=data.frame(table(dat19$DRINKING))
 alc_df2020=data.frame(table(dat20$DRINKING))
@@ -124,54 +182,58 @@ years = c('2019', '2020')
 
 df_alc=data.frame(years, counts)
 
-ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", width = .3)+ggtitle("Alcohol Related Death Count")
+ggplot(data = df_alc, aes(x=years, y=counts))+geom_bar(stat = "identity", 
+width = .3)+ggtitle("Alcohol Related Death Count")
 
 percent_alcohol = ((counts[2]-counts[1])/counts[1]) * 100
-percent_alcohol 
+percent_alcohol
 ```
 
 
-#Ridge Regression Method (Math)
+# Ridge Regression Method (Math):
 
-Ridge Regression is used to fit a model that has multicollinearity while trying to 
-minimize the (RSS) sum of square residuals. 
-Col-linearity in regression is the event of two or more variables being highly linearly related. 
+Ridge Regression is used to fit a model that has multicollinearity while 
+trying to minimize the (RSS) sum of square residuals.
+Col-linearity in regression is the event of two or more variables being highly 
+linearly related.
 
-
-In terms of relationships between variables, our use case refers to the target or dependent 
-variable as the number of car wrecks. The independent variable or predictor variable could be any of these; 
-speeding, weather, age, covid cases, alcohol, drugs, etc. 
-
-Also note that ridge regression requires the data to be standardized such that each predictor variable has a mean of 0 and a standard deviation of 1.
+In terms of relationships between variables, our use case refers to the target or dependent
+variable as the number of car wrecks. The independent variable or predictor variable could be any of these;
+speeding, weather, age, covid cases, alcohol, drugs, etc.
 
 *least squares regression tries to find coefficient estimates that minimize the sum of squared residuals (RSS) (https://www.statology.org/ridge-regression-in-r/)
 
-As the tuning parameter gets larger the value of the coefficients shrink towards 0. 
+As the tuning parameter gets larger the value of the coefficients shrink towards 0.
 
-#The Ridge Regession Esimator 
+# The Ridge Regession Esimator:
 
-$$ \sum [yi- ŷ_i^2] + λ \sum_{k=1}^{k} y_i^2 $$
+$$ \sum \left[ yi- \hat y_i^2 \right] + \lambda \sum_{k=1}^{k} y_i^2 $$
 
-Another form in linear algebra. 
-$$\hat{\beta}\left(\lambda\right)=\left(X^TX+\lambda I_{p \times p}\right)^{-1}X^TY$$ 
+Another form in linear algebra.
+$$\hat{\beta}\left(\lambda\right)=\left(X^TX+\lambda I_{p \times p}\right)^{-1}X^TY$$
 
-Linear algebra plays a significant role in understanding the lambda value as well as the rank and matrix operations. 
-Selecting a valid lambda value is crucial to getting the best fit for the model.  
+Linear algebra plays a significant role in understanding the lambda 
+value as well as the rank and matrix operations.
+Selecting a valid lambda value is crucial to getting the best fit for the model.
 
 $$y=\ f\left(x_1,\ x_2,\ x_3...\ x_n\right) $$
 
-To put it simply we want to know which predictor $$(x_i)$$ had the greatest affect on the dependent variable y.
+To put it simply we want to know which predictor $$(x_i)$$ had the greatest 
+affect on the dependent variable y.
 
 
-# Ridge Regression Analysis 
+# Part 2: FARS 2020 Comparison with COVID-19
 
-# Cleaning and Reformatting Data
+# Cleaning and Reformatting Data:
 
-The Covid-19 dataset taken from the Covid Tracking Project was reformatted to include the final positive case counts from each month between January and December 2020. Given that the original data set tracked cumulative daily counts, this was calculated by taking the total case counts on the last day of each month.
+The Covid-19 dataset taken from the Covid Tracking Project was reformatted to 
+include the final positive case counts from each month between January and December 2020. 
+Given that the original data set tracked cumulative daily counts, this was 
+calculated by taking the total case counts on the last day of each month.
 
 ```{r}
 
-#This section gets the total count of covid-19 cases from January-December 2020 
+#This section gets the total count of covid-19 cases from January-December 2020
 dat <- read.csv('national-history.csv')
 
 #convert date to datetime
@@ -183,7 +245,7 @@ y_2020 <- filter(dat, dat$date <= '2020-12-31' )
 
 #take the final case counts from each month
 # creates an identifier with which to group
-y_2020$mon_yr <- format(as.Date(y_2020$date), '%Y-%m') 
+y_2020$mon_yr <- format(as.Date(y_2020$date), '%Y-%m')
 #groups by created month identifier and then keeps only those rows with last(max) date
 cases <- y_2020 %>% group_by(mon_yr) %>% filter(date == max(date))
 cases
@@ -192,7 +254,7 @@ cases
 
 # Graphing and Displaying Reformatted Data:
 
-In graphing the number of positive covid-19 cases, a log scale was added to better show the overall number of cases nationwide. 
+In graphing the number of positive covid-19 cases, a log scale was added to better show the overall number of cases nationwide.
 
 ```{r}
 #graph the positive cases
@@ -205,16 +267,19 @@ ggplot(data = cases, aes(x = month, y = logpositive)) +
   geom_point() +
   labs(x = "Month",
     y = "Postive Cases (Log)",
-    title = "Positive Covid Cases in 2020 (Log form)") +   theme(axis.text.x=element_text(angle=45,hjust=1))
+    title = "Positive Covid Cases in 2020 (Log form)") + 
+  theme(axis.text.x=element_text(angle=45,hjust=1))
 
 ggplot(data = cases, aes(x = month, y = positive)) +
-  geom_point() + 
+  geom_point() +
   labs(x = "Month",
     y = "Postive Cases",
-    title = "Positive Covid Cases in 2020") + theme(axis.text.x=element_text(angle=45,hjust=1)) 
+    title = "Positive Covid Cases in 2020") + 
+  theme(axis.text.x=element_text(angle=45,hjust=1))
 ```
 
-For additional comparison, a bar chart was added to reflect the total covid-19 case counts in both the normal and log scales.
+For additional comparison, a bar chart was added to reflect the total covid-19 
+case counts in both the normal and log scales.
 
 ```{r}
 #as a bar chart
@@ -237,15 +302,15 @@ ggplot(cases, aes(month)) + geom_bar(aes(weight=logpositive), position="dodge", 
 Road accident data taken from FARS (Fatality Analysis Reporting System) 2020 was cleaned and reformatted to reflect aggregated data by month. The reformatted data was then merged with covid-19 data to show the following:
 
 - month of the year
-- total number of road incidents reported by FARS 
-- total positive covid-19 case counts 
-- the average age of individuals involved in FARS incidents 
+- total number of road incidents reported by FARS
+- total positive covid-19 case counts
+- the average age of individuals involved in FARS incidents
 - total number of drinking violations
 - total number of speeding violations
 
 The following rmd blocks show the complete process of reformatting and merging the two data sets:
 
-# 1. Read in FARS 2020 data set
+# 1. Read in FARS 2020 data set:
 
 ```{r}
 # total car wrecks in 2020
@@ -253,7 +318,7 @@ car_wrecks <- read.csv('person2020.csv')
 
 ```
 
-# 2. Aggregate the total number of entries per month 
+# 2. Aggregate the total number of entries per month:
 
 ```{r}
 #counts of car wrecks by month
@@ -315,7 +380,7 @@ total.a
 
 ```
 
-#6. Drinking reports were calculated based on known reported drinking incidents, where the DRINKING column in the original FARS data set = 1. A sum for each month was calculated and inserted into a dataframe. 
+#6. Drinking reports were calculated based on known reported drinking incidents, where the DRINKING column in the original FARS data set = 1. A sum for each month was calculated and inserted into a dataframe.
 
 ```{r}
 #here we aggregate Drinking reports
@@ -332,7 +397,7 @@ car_wrecks.drink
 
 ```
 
-# 7. Drinking counts were merged into the data frame. 
+# 7. Drinking counts were merged into the data frame.
 
 ```{r}
 #merge drinking with total
@@ -342,13 +407,16 @@ total.b
 
 ```
 
-#8. Speeding related incidents were manually taken from the FARS annual report. 
-The following vector reflects the total speeding violation counts per month in 2020. A month vector was added and speeding related incidents transformed into a data frame. Dataframe total.c reflects the final data frame transformation with all our predictor variables. 
+#8. Speeding related incidents were manually taken from the FARS annual report.
+The following vector reflects the total speeding violation counts per month in 2020. 
+A month vector was added and speeding related incidents transformed into a data frame. 
+Dataframe total.c reflects the final data frame transformation with all our predictor variables.
 
 ```{r}
 #add speeding-related incidents
 #manually taken from page 19
-#Table 4. Monthly Traffic Fatalities, by Speeding Involvement, Alcohol-Impaired Driving, and Passenger Vehicle Occupant Restraint Use, 2019 and 2020
+#Table 4. Monthly Traffic Fatalities, by Speeding Involvement, 
+#Alcohol-Impaired Driving, and Passenger Vehicle Occupant Restraint Use, 2019 and 2020
 
 speeding <- c(733, 718, 735, 761, 1007, 1189, 1151, 1089, 1079, 999, 883, 914)
 month<-month.name
@@ -363,7 +431,7 @@ total.c
 
 ```
 
-The following graph shows the final monthly aggregates for each predictor in our data set. 
+The following graph shows the final monthly aggregates for each predictor in our data set.
 
 ```{r}
 #graph the totals
@@ -372,8 +440,9 @@ total.c$logDrinks <- log(total.c$drink_counts)
 total.c$logSpeed <- log(total.c$Speeding)
 
 # Reshape data frame
-df_reshaped <- data.frame(x = total.c$Month,                           
-                       y = c(total.c$logCases, total.c$logCrashes, total.c$logAge, total.c$logDrinks, total.c$logSpeed),
+df_reshaped <- data.frame(x = total.c$Month,
+                       y = c(total.c$logCases, total.c$logCrashes, 
+                             total.c$logAge, total.c$logDrinks, total.c$logSpeed),
                        group = c(rep("Covid Cases", nrow(df)),
                                  rep("Crashes", nrow(df)),
                                  rep("Average Age", nrow(df)),
@@ -383,7 +452,9 @@ df_reshaped <- data.frame(x = total.c$Month,
 
 df_reshaped$x <- factor(df_reshaped$x, levels = month.name)
 
-ggplot(df_reshaped, aes(x, y, col = group)) +  geom_line(aes(group = group)) + geom_point(aes(group = group)) +  theme(axis.text.x=element_text(angle=45,hjust=1)) +  labs(x = "Month",
+ggplot(df_reshaped, aes(x, y, col = group)) +  geom_line(aes(group = group)) + 
+  geom_point(aes(group = group)) +  
+  theme(axis.text.x=element_text(angle=45,hjust=1)) +  labs(x = "Month",
     y = "Predictors",
     title = "Counts of Predictor Variables on Car Accidents by Month in 2020 (Log Scale)")
 
@@ -391,7 +462,12 @@ ggplot(df_reshaped, aes(x, y, col = group)) +  geom_line(aes(group = group)) + g
 
 # Ridge Regression Analysis:
 
-The ridge regression was performed using the final transformed data frame "total.c". In this analysis, the response variable is defined as the total number of incidents per month reported by FARS. Columns 'Cases', 'Avg_Age', 'drink_counts', and 'Speeding' were formatted into an 'x' matrix. Using the glmnet package, a ridge regression model was fitted onto the x and y variables, and an optimal lambda value minimizing the mean squared error was chosen.
+The ridge regression was performed using the final transformed data frame "total.c". 
+In this analysis, the response variable is defined as the total number of incidents 
+per month reported by FARS. Columns 'Cases', 'Avg_Age', 'drink_counts', and 'Speeding' 
+were formatted into an 'x' matrix. Using the glmnet package, a ridge regression model 
+was fitted onto the x and y variables, and an optimal 
+lambda value minimizing the mean squared error was chosen.
 
 ```{r}
 #begin ridge regression
@@ -412,11 +488,14 @@ best_lambda <- cv_model$lambda.min
 best_lambda
 
 #produce plot of test MSE by lambda value
-plot(cv_model) 
+plot(cv_model)
 
 ```
 
-Based on the values of the coefficients of the best model, we can conclude that the number of positive covod-19 cases had very little to no effect on the overall number of FARS driving incidents in 2020. In fact it appears that the average age of drivers had the largest impact, followed by overall alcohol consumption and speeding incidents.
+Based on the values of the coefficients of the best model, we can conclude that the 
+number of positive covod-19 cases had very little to no effect on the overall number 
+of FARS driving incidents in 2020. In fact it appears that the average age of 
+drivers had the largest impact, followed by overall alcohol consumption and speeding incidents.
 
 ```{r}
 
@@ -426,7 +505,8 @@ coef(best_model)
 
 ```
 
-The model below shows the Ridge trace plot for each of the coefficients as the log lambda increases. As lambda increases, the coefficients trend towards 0. 
+The model below shows the Ridge trace plot for each of the coefficients as the log lambda increases. 
+As lambda increases, the coefficients trend towards 0.
 
 ```{r}
 #produce Ridge trace plot
@@ -436,7 +516,11 @@ plot(model, xvar = "lambda")
 
 # Verifying our Model
 
-To verify the accuracy of our model, we predicted some y-values using our best model and used these values to calculate the total sum of squares (sst) and the sum of squared errors (sse). From these values, we know that the R^2 value of our model is about 0.94. Thus, our model explains about 94% of the variation in our data.
+To verify the accuracy of our model, we predicted some y-values using our best 
+model and used these values to calculate the total sum of squares (sst) 
+and the sum of squared errors (sse). From these values, 
+we know that the R^2 value of our model is about 0.94. 
+Thus, our model explains about 94% of the variation in our data.
 
 ```{r}
 #use fitted best model to make predictions
@@ -450,6 +534,29 @@ sse <- sum((y_predicted - y)^2)
 rsq <- 1 - sse/sst
 rsq
 ```
+
+Because the original data sets had to be aggregated in order to run the model,
+there may have been some loss in the data when translating into the model.
+Many entries in the FARS data set had unknown values.
+Thus there may have been insufficient data for the Drinking, Age, and Speeding columns,
+and the coefficients for the best-fit Ridge regression model may not be representative of the true population values.
+
+Finally, there may have been many other predictors not considered within this 
+report that could have affected our conclusion. Nevertheless, the empirical 
+evidence of the study seems to suggest that there were differences in the number of vehicle accidents and fatalities between 2019 and 2020,
+and that the COVID-19 pandemic did not appear to have a significant impact on the number of road incidents in 2020. The number of overall car wreck incidents went down from 2019-2020 however, the total number 
+of car wreck fatalities increased.[2]
+
+
+# Citations 
+
+*[0] Ridge Regression in R (Step-by-Step) https://www.statology.org/ridge-regression-in-r/ 
+*[1] Elements of Statistical Learning Data Mining, Inference, and Prediction
+*[2] https://www.nhtsa.gov/press-releases/2020-traffic-crash-data-fatalities
+*[3] COVID dataset https://covidtracking.com/data/national 
+*[4] FARS https://www.nhtsa.gov/file-downloads?p=nhtsa/downloads/FARS/ 
+
+
 
 
 
